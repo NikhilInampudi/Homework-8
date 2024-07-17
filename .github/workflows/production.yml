@@ -1,40 +1,52 @@
-name: Python application workflow
+name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - main
   pull_request:
-    branches: [ master ]
+    branches:
+      - main
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
-    environment: production
     steps:
-      - uses: actions/checkout@v3
-
+      - uses: actions/checkout@v4
+      
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.12'  # Set this to your Python version
-
+          python-version: '3.9'
+          
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
-      - name: Run Pytest
+          pip install -r requirements.txt # or use poetry install if you're using poetry
+          
+      - name: Run tests with Pytest
         run: pytest
 
+  build-and-push-docker:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: production # Specifies the environment to use
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
       - name: Log in to DockerHub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
+          
       - name: Build and push Docker image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           push: true
-          tags: ninampudi/Homework8:latest
+          tags: ninam001/qr_code:latest
+
+          # Add other relevant build parameters here

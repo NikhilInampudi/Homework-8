@@ -1,4 +1,3 @@
-
 FROM python:3.12-bullseye
 WORKDIR /myapp
 COPY . /myapp/
