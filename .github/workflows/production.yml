@@ -47,6 +47,6 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: ninam001/qr_code:latest
+          tags: ninam001/qr_code:latest2
 
           # Add other relevant build parameters here
